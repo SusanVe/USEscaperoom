@@ -1,8 +1,10 @@
 // Check if the mouse is over a rectangle and write the status to the serial port
 
 import processing.serial.*;
+import nl.tue.id.oocsi.*;
 
 Serial port;                       // Create object from Serial class
+String message;
 
 void setup() {
   size(500, 500);
@@ -10,8 +12,16 @@ void setup() {
   frameRate(10);
   // Open the port that the board is connected to and use the same speed (9600 bps)
   port = new Serial(this, 9600);   
+  OOCSI oocsi = new OOCSI(this, "theplate", "oocsi.id.tue.nl");
+  oocsi.subscribe("testchannelgroup11");
 }
 
+void receiveString(OOCSIEvent event) {
+  message = event.getString("string", ""); 
+  port.write(message);
+}
+
+/*
 void draw() {
   background(255);
   if (mouseOverRect1() == true)  {  // If mouse is over square,
@@ -44,3 +54,4 @@ boolean mouseOverRect2() {        // Test if mouse is over square
 boolean mouseOverRect3() {        // Test if mouse is over square
   return ((mouseX >= 350) && (mouseX <= 450) && (mouseY >= 50) && (mouseY <= 150));
 }
+*/
