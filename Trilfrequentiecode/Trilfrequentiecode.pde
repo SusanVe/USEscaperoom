@@ -17,8 +17,10 @@ void setup() {
 }
 
 void receiveString(OOCSIEvent event) {
-  message = event.getString("string", ""); 
-  port.write(message);
+  message = event.getString("string", "");
+  char[] charArray = message.toCharArray(); 
+  for (int i = 0; i < charArray.length; i++){ 
+  port.write(charArray[i]);
 }
 
 /*
