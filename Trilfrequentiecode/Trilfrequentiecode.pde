@@ -10,11 +10,14 @@ String portName;
 void setup() {
   // Open the port that the board is connected to and use the same speed (9600 bps)  
   OOCSI oocsi = new OOCSI(this, "theplate", "oocsi.id.tue.nl");
-  oocsi.subscribe("testchannelgroup11");
+  oocsi.register("handleOOCSIEvent");
   delay(2000);
 }
 
-void handleOOCSIEvent(OOCSIEvent event) {
+void handleOOCSIEvent(OOCSIEvent event, OOCSIData response) {
+  if (event.has("string")){
+    response.data("result", 1);
+  }
   portName = Serial.list()[0];
   port = new Serial(this, portName, 9600);
   message = event.getString("stringCode", "");

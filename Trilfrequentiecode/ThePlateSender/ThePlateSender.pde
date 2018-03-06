@@ -9,13 +9,17 @@ void setup() {
   noStroke();
   frameRate(10);
   // Open the port that the board is connected to and use the same speed (9600 bps)  
-  oocsi = new OOCSI(this, "theplateinput", "oocsi.id.tue.nl");
+  oocsi = new OOCSI(this, "theplateAPI", "oocsi.id.tue.nl");
   noLoop();
 }
 
 void draw() {
+  fill(180, 120, 120);
+  rect(width/2., height/2., 5 * value, 5 * value);
+  println("calling thePlate service with " + string);
+  
     oocsi
     .channel("theplate")
-      .data("stringCode", "HI")
+      .data("stringCode", string)
         .send();  
 }
