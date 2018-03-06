@@ -22,7 +22,6 @@ void handleOOCSIEvent(OOCSIEvent event, OOCSIData response) {
   port = new Serial(this, portName, 9600);
   message = event.getString("stringCode", "");
   println("");
-  println(message);
   char[] charArray = message.toCharArray(); 
   for (int i = 0; i < charArray.length; i++){
     print(charArray[i]);

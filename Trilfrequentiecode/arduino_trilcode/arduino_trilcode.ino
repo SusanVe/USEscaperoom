@@ -5,9 +5,9 @@ int compghi = 6;                   // Vibration componenten for 'GHI'
 int compjkl = 9;                   // Vibration componenten for 'JKL'
 int compmno = 10;                  // Vibration componenten for 'MNO'
 int comppqrs = 11;                 // Vibration componenten for 'PQRS'
-int comptuv = 0;                   // Vibration componenten for 'TUV'
-int compwxyz = 0;                  // Vibration componenten for 'WXYZ'
-int compspace = 0;                 // Vibration componenten for space
+int comptuv = 0;                   // Vibration componenten for 'TUV' !!! niet juiste input
+int compwxyz = 0;                  // Vibration componenten for 'WXYZ' !!! niet juiste input
+int compspace = 0;                 // Vibration componenten for space !!! niet juiste input
 
 int powerVib = 153;                // Power set to 60% (153/255) for protection, because of 5v output
 int waitTime = 300;                // Set duration of the vibration
@@ -34,84 +34,111 @@ void loop() {
 
     case 'a':
       oneVib(compabc);
+      val = 0;
     break;
     case 'b':
       twoVib(compabc);
+      val = 0;
     break;
     case 'c':
       threeVib(compabc);
+      val = 0;
     break;
     case 'd':
       oneVib(compdef);
+      val = 0;
     break;
     case 'e':
       twoVib(compdef);
+      val = 0;
     break;
     case 'f':
       threeVib(compdef);
+      val = 0;
     break;
     case 'g':
       oneVib(compghi);
+      val = 0;
     break;
     case 'h':
       twoVib(compghi);
+      val = 0;
     break;
     case 'i':
       threeVib(compghi);
+      val = 0;
     break;
     case 'j':
       oneVib(compjkl);
+      val = 0;
     break;
     case 'k':
       twoVib(compjkl);
+      val = 0;
     break;
     case 'l':
       threeVib(compjkl);
+      val = 0;
     break;
     case 'm':
       oneVib(compmno);
+      val = 0;
     break;
     case 'n':
       twoVib(compmno);
+      val = 0;
     break;
     case 'o':
       threeVib(compmno);
+      val = 0;
     break;
     case 'p':
       oneVib(comppqrs);
+      val = 0;
     break;
     case 'q':
       twoVib(comppqrs);
+      val = 0;
     break;
     case 'r':
       threeVib(comppqrs);
+      val = 0;
     break;
     case 's':
       fourVib(comppqrs);
+      val = 0;
     break;
     case 't':
       oneVib(comptuv);
+      val = 0;
     break;
     case 'u':
       twoVib(comptuv);
+      val = 0;
     break;
     case 'v':
       threeVib(comptuv);
+      val = 0;
     break;
     case 'w':
       oneVib(compwxyz);
+      val = 0;
     break;
     case 'x':
       twoVib(compwxyz);
+      val = 0;
     break;
     case 'y':
       threeVib(compwxyz);
+      val = 0;
     break;
     case 'z':
       fourVib(compwxyz);
+      val = 0;
     break;
     case ' ':
       oneVib(compspace);
+      val = 0;
     break;
   }
 }
