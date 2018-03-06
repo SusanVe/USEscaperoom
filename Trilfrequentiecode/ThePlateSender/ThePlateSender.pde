@@ -5,7 +5,7 @@ import nl.tue.id.oocsi.client.services.*;
 OOCSI oocsi; 
 
 void setup() {
-  size(500, 500);
+  size(200, 200);
   noStroke();
   frameRate(10);
   // Open the port that the board is connected to and use the same speed (9600 bps)  
@@ -14,12 +14,15 @@ void setup() {
 }
 
 void draw() {
-  fill(180, 120, 120);
-  rect(width/2., height/2., 5 * value, 5 * value);
-  println("calling thePlate service with " + string);
+  String string = " ";
+  int result;
+
+  println("Sending to the plate: " + string);
   
-    oocsi
-    .channel("theplate")
-      .data("stringCode", string)
-        .send();  
+  OOCSICall call = oocsi.call("handleOOCSIEvent", 1000).data("stringCode", string);
+  call.sendAndWait();
+  if (call.hasResponse()) {
+    result = call.getFirstResponse().getInt("result", 0);
+    println("Your message has been received succesfully and will be outputted" + result);
+  }
 }
