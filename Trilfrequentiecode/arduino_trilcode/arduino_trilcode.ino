@@ -12,10 +12,10 @@ void loop() {
   if (Serial.available()) {        // If data is available to read, 
     val = Serial.read();           // read it and store it in val 
   } 
-  if (val == '2') {                // If H was received
+  if (val == 'H') {                // If H was received
     twoVib();
     val = 0;
-  } else if (val == '3') {         // If I was received
+  } else if (val == 'I') {         // If I was received
     threeVib();
     val = 0;
   } else if (val == '4') {
