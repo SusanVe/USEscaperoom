@@ -63,7 +63,7 @@ void thePlate(OOCSIEvent event) {
   // if nfc tags are scannend in right order plate will start outputting
   //colorbox will turn on
   if (step == 1) {
-    oocsi.channel("theplateAPI").data("stringCode", message).send();
+    oocsi.channel("thePlateHandler").data("string", message).send();
     oocsi.channel("LE_ColorBox").data("Turn on", true).send();
     //send colorbox the right code if necessary
   }
