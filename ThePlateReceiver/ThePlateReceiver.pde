@@ -8,13 +8,13 @@ String message;
 String portName;
 
 void setup() {
-  // Open the port that the board is connected to and use the same speed (9600 bps)  
+  // Open the port that the board is connected to and use the same speed (9600 bps)
   OOCSI oocsi = new OOCSI(this, "theplate", "oocsi.id.tue.nl");
-  oocsi.register("handleOOCSIEvent");
+  oocsi.register("thePlateHandler");
   delay(2000);
 }
 
-void handleOOCSIEvent(OOCSIEvent event, OOCSIData response) {
+void thePlateHandler(OOCSIEvent event, OOCSIData response) {
   if (event.has("string")){
     response.data("result", 1);
   }
@@ -22,7 +22,7 @@ void handleOOCSIEvent(OOCSIEvent event, OOCSIData response) {
   port = new Serial(this, portName, 9600);
   message = event.getString("stringCode", "");
   println("");
-  char[] charArray = message.toCharArray(); 
+  char[] charArray = message.toCharArray();
   for (int i = 0; i < charArray.length; i++){
     print(charArray[i]);
     delay(2000);
