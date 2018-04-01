@@ -11,6 +11,12 @@ import nl.tue.id.oocsi.client.services.*;
 // ******************************************************
 
 int step = 0;
+String[] order = new String[4];
+order[0] = "blue";
+order[1] = "red";
+order[2] = "yellow";
+order[3] = "green";
+String message = "apple pear cherry";
 
 OOCSI oocsi;
 
@@ -24,51 +30,66 @@ void setup() {
   oocsi = new OOCSI(this, "LE_level_controller_group11_1", "localhost");
 
   // subscribe to all relevant channels
-  oocsi.subscribe("LE_nfc_tags");
-  oocsi.subscribe("LE_plate");
-  oocsi.subscribe("LE_painting");
+  oocsi.subscribe("Group7NFC");
+  oocsi.subscribe("LE_colorbox");
   oocsi.subscribe("LE_safe");
-  oocsi.subscribe("LE_beating_heart");
 
   // start by resetting
   levelReset();
 }
 
 
-void LE_nfc_tags(OOCSIEvent event) {
-  // tags get scanned ncf module code should send the code and the string below
-  if (event.has("ncf scanned")) {
-    String code = event.getString("code entered"); 
-    step = 1;
+void NFC(OOCSIEvent event) {
+  //send 1 to the NFC module to start the scanner
+  oocsi.channel("PreviousModule").data("completed", 1);
+  // receive color of scanned tag, check the order
+  //TODO fix this check thing with strings, because this only works for 1 iteration.
+  if (event.has("colour")) {
+    String colour = event.getString("colour"); 
+    String[] scanOrder = new String[4];
+    for (int i = 0; i < scanOrder.length; i++) {
+      scanOrder[i] = colour;
+      if(order == scanOrder) {
+      step = 1;
+      } else {
+        //TODO increase heartbeat once we receive their code
+        //TODO send to right heartbeatchannel
+    }
   }
 }
 
 
-void LE_painting(OOCSIEvent event) {
-  // if nfc tags are scannend in right order, painting and plate should turn on
+void thePlate(OOCSIEvent event) {
+  // if nfc tags are scannend in right order plate will start outputting
+  //colorbox will turn on
   if (step == 1) {
-    oocsi.channel("LE_plate").data("vibrate", true).send();
-    oocsi.channel("LE_painting").data("light up", true).send();
+    oocsi.channel("theplateAPI").data("stringCode", message).send();
+    oocsi.channel("LE_ColorBox").data("Turn on", true).send();
+    //send colorbox the right code if necessary
   }
-  // if right code is pressed/enter, painting module code should send string below
-  if(event.has("painting code entered")){
+  // if right code is pressed/enter, colorbox will return a value
+  //TODO subscribe to channel that outputs right code
+  if(event.has("right code")){
     step = 2;
   }
 }
 
 void LE_safe(OOCSIEvent event) {
   // if right code is pressed/enter, safe should turn on
-  if ( step == 2){
-    oocsi.channel("LE_safe").data("activate laser", true).send();
+  // plate should turn off
+  // TODO send to receiverchannel
+  if (step == 2){
+    oocsi.channel("LE_safe").data("safeLaser", 1).send();
+    oocsi.channel("thePlateAPI").data("stringCode", "").send();
   }
   // if safe is opened, safe module code should send string below
-  if (event.has("safe open")) {
-    step = 3;
+  // TODO subscribe to channel that outputs completeSafe
+  if (event.has("completeSafe")) {
+    if(completeSafe > 1) {
+      step = 3;
+      //TODO turn off heart module
+    }
   }
-}
-
-void LE_beating_heart(OOCSIEvent event) {
-
 }
 
 void levelReset() {
