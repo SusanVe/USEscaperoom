@@ -85,7 +85,7 @@ void LE_safe(OOCSIEvent event) {
   // if safe is opened, safe module code should send string below
   // TODO subscribe to channel that outputs completeSafe
   if (event.has("completeSafe")) {
-    if(completeSafe > 1) {
+    if(completeSafe > 0) {
       step = 3;
       //TODO turn off heart module
     }
