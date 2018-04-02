@@ -17,6 +17,14 @@ order[1] = "red";
 order[2] = "yellow";
 order[3] = "green";
 String message = "apple pear cherry";
+//poging twee tot checkmethod
+boolean fullColor = false; 
+ArrayList<String> correctColors = new ArrayList<String>(); 
+ArrayList<String> colors = new ArrayList<String>(); 
+correctColors.add("blue");
+correctColors.add("red");
+correctColors.add("yellow");
+correctColors.add("green"); 
 
 OOCSI oocsi;
 
@@ -44,7 +52,7 @@ void NFC(OOCSIEvent event) {
   oocsi.channel("PreviousModule").data("completed", 1);
   // receive color of scanned tag, check the order
   //TODO fix this check thing with strings, because this only works for 1 iteration.
-  if (event.has("colour")) {
+  /*if (event.has("colour")) {
     String colour = event.getString("colour"); 
     String[] scanOrder = new String[4];
     for (int i = 0; i < scanOrder.length; i++) {
@@ -55,7 +63,38 @@ void NFC(OOCSIEvent event) {
         //TODO increase heartbeat once we receive their code
         //TODO send to right heartbeatchannel
     }
+  } */
+  
+  /* 
+  - boolean is false
+  - array maken en daar alle colors instoppen
+  - als array lang genoeg is
+  - boolean true
+  - hierna checken of juiste combi
+  - foute combi, heartbeat sneller
+  - juiste combi, plate aan 
+  */
+  
+  if(!fullColor){
+     if(event.has("colour")){
+       String color = event.getString("colour")
+       colors.add(color); 
+     }
   }
+   if(colors.length() == 4){
+     fullColor = true; 
+     if(colors.equals(correctColors){
+         //het is feest we kunnen door naar de volgende module
+         step = 1; 
+     }
+     else {
+         colors.clear(); 
+         fullColor = false;  
+         //TODO increase heartbeat once we receive their code
+         //TODO send to right heartbeatchannel
+     }
+   }
+  
 }
 
 
