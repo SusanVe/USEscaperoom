@@ -67,7 +67,7 @@ void NFC(OOCSIEvent event) {
   
   /* 
   - boolean is false
-  - array maken en daar alle colors instoppen
+  - array maken en daar alle colors instoppen (als deze er nog niet in zitten)
   - als array lang genoeg is
   - boolean true
   - hierna checken of juiste combi
@@ -75,12 +75,15 @@ void NFC(OOCSIEvent event) {
   - juiste combi, plate aan 
   */
   
-  if(!fullColor){
-     if(event.has("colour")){
-       String color = event.getString("colour")
-       colors.add(color); 
-     }
-  }
+    if(!fullColor){
+       if(event.has("colour")){
+         String color = event.getString("colour");
+         if(!colors.contains(color)){
+           colors.add(color); 
+         }
+       }
+    }
+  
    if(colors.length() == 4){
      fullColor = true; 
      if(colors.equals(correctColors){
