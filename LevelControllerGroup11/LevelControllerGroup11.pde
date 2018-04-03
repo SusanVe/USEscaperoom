@@ -1,5 +1,7 @@
 import nl.tue.id.oocsi.*;
 import nl.tue.id.oocsi.client.services.*;
+import java.util.*;
+import java.io.*;
 
 // ******************************************************
 // This example requires a running OOCSI server!
@@ -11,12 +13,17 @@ import nl.tue.id.oocsi.client.services.*;
 // ******************************************************
 
 int step = 0;
+//TODO mag dit weg?
+//hij huilt als ik deze weg wil halen
 String[] order = new String[4];
 order[0] = "blue";
 order[1] = "red";
 order[2] = "yellow";
 order[3] = "green";
+
 String message = "apple pear cherry";
+
+
 //poging twee tot checkmethod
 boolean fullColor = false; 
 ArrayList<String> correctColors = new ArrayList<String>(); 
@@ -25,6 +32,7 @@ correctColors.add("blue");
 correctColors.add("red");
 correctColors.add("yellow");
 correctColors.add("green"); 
+int counter = 0; 
 
 OOCSI oocsi;
 
@@ -41,11 +49,22 @@ void setup() {
   oocsi.subscribe("Group7NFC");
   oocsi.subscribe("LE_colorbox");
   oocsi.subscribe("LE_safe");
+  oocsi.subscribe("schoenmaat"); //heartbeat channel 
 
   // start by resetting
   levelReset();
 }
 
+void heartBeat(OOCSIEvent event) {
+  //op het begin hart langzaam laten kloppen, alles doorgegeven want variabelen hadden (dacht ik) geen initiële waarden 
+  if(step == 0){
+    oocsi.channel("schoenmaat").data("intervalA",1).send();
+    oocsi.channel("schoenmaat").data("intervalB",0).send();
+    oocsi.channel("schoenmaat").data("intervalC",0).send();
+    oocsi.channel("schoenmaat").data("intervalD",0).send();
+    oocsi.channel("schoenmaat").data("flatline",0).send();
+  }
+}
 
 void NFC(OOCSIEvent event) {
   //send 1 to the NFC module to start the scanner
@@ -87,18 +106,42 @@ void NFC(OOCSIEvent event) {
    if(colors.length() == 4){
      fullColor = true; 
      if(colors.equals(correctColors){
-         //het is feest we kunnen door naar de volgende module
+         //go to next module, plate and decrease heartbeat
          step = 1; 
+         counter--;
+         checkBeat(); 
      }
      else {
          colors.clear(); 
          fullColor = false;  
-         //TODO increase heartbeat once we receive their code
-         //TODO send to right heartbeatchannel
+         counter++; 
+         //everytime the nfc tags get scanned in the wrong order, increase heartbeat
+         checkBeat(); 
      }
    }
   
 }
+
+//TODO check even of dit werkt? Anders alle if'jes in de if else statement hierboven zetten
+ public void checkBeat(){
+         if(counter == 1){
+            oocsi.channel("schoenmaat").data("intervalA",0).send();
+            oocsi.channel("schoenmaat").data("intervalB",1).send();
+         }
+         else if(counter == 2) {
+            oocsi.channel("schoenmaat").data("intervalB",0).send();
+            oocsi.channel("schoenmaat").data("intervalC",1).send();
+         }
+         else if(counter == 3) {
+            oocsi.channel("schoenmaat").data("intervalC",0).send();
+            oocsi.channel("schoenmaat").data("intervalD",1).send();
+         }
+         else if(counter == 4) {
+            oocsi.channel("schoenmaat").data("intervalD",0).send();
+            oocsi.channel("schoenmaat").data("flatline",1).send();
+            //TODO stop the level, game over levelReset() ??
+         }
+   }
 
 
 void thePlate(OOCSIEvent event) {
@@ -129,7 +172,12 @@ void LE_safe(OOCSIEvent event) {
   if (event.has("completeSafe")) {
     if(completeSafe > 0) {
       step = 3;
-      //TODO turn off heart module
+      //flatline after opening safe
+      oocsi.channel("schoenmaat").data("intervalA",0).send();
+      oocsi.channel("schoenmaat").data("intervalB",0).send();
+      oocsi.channel("schoenmaat").data("intervalC",0).send();
+      oocsi.channel("schoenmaat").data("intervalD",0).send();
+      oocsi.channel("schoenmaat").data("flatline",1).send();
     }
   }
 }
