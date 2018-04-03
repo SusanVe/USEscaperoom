@@ -1,13 +1,14 @@
 char val;                          // Data received from the serial port 
-int compabc = 3;                   // Vibration componenten for 'ABC'
-int compdef = 5;                   // Vibration componenten for 'DEF'
-int compghi = 6;                   // Vibration componenten for 'GHI'
-int compjkl = 9;                   // Vibration componenten for 'JKL'
-int compmno = 10;                  // Vibration componenten for 'MNO'
-int comppqrs = 11;                 // Vibration componenten for 'PQRS'
-int comptuv = 0;                   // Vibration componenten for 'TUV' !!! niet juiste input
-int compwxyz = 0;                  // Vibration componenten for 'WXYZ' !!! niet juiste input
-int compspace = 0;                 // Vibration componenten for space !!! niet juiste input
+int compabc = 2;                   // Vibration componenten for 'ABC'
+int compdef = 3;                   // Vibration componenten for 'DEF'
+int compghi = 4;                   // Vibration componenten for 'GHI'
+int compjkl = 5;                   // Vibration componenten for 'JKL'
+int compmno = 6;                  // Vibration componenten for 'MNO'
+int comppqrs = 7;                 // Vibration componenten for 'PQRS'
+int comptuv = 8;                   // Vibration componenten for 'TUV'
+int compwxyz = 9;                  // Vibration componenten for 'WXYZ'
+int compspace = 10;                 // Vibration componenten for space
+int comp1 = 11;                     // Vibration component for number one
 
 int powerVib = 153;                // Power set to 60% (153/255) for protection, because of 5v output
 int waitTime = 300;                // Set duration of the vibration
@@ -140,39 +141,43 @@ void loop() {
       oneVib(compspace);
       val = 0;
     break;
+    case '1':
+      oneVib(comp1);
+      val = 0;
+    break;
   }
 }
 
 
 void oneVib(int compNr) {
-    analogWrite(compNr, powerVib);    // vibrate once
+    digitalWrite(compNr, HIGH);    // vibrate once
     delay(waitTime);
-    analogWrite(compNr, 0);
+    digitalWrite(compNr, LOW);
 }
 
 void twoVib(int compNr) {
     for (int counter = 1; counter <= 2; counter++) {
-    analogWrite(compNr, powerVib);    // vibrate four times
+    digitalWrite(compNr, HIGH);    // vibrate four times
     delay(waitTime);
-    analogWrite(compNr, 0);
+    digitalWrite(compNr, LOW);
     delay(waitTime);
     }
 }
 
 void threeVib(int compNr) {
     for (int counter = 1; counter <= 3; counter++) {
-    analogWrite(compNr, powerVib);    // vibrate four times
+    digitalWrite(compNr, HIGH);    // vibrate four times
     delay(waitTime);
-    analogWrite(compNr, 0);
+    digitalWrite(compNr, LOW);
     delay(waitTime);
     }
 }
 
 void fourVib(int compNr) {
     for (int counter = 1; counter <= 4; counter++) {
-    analogWrite(compNr, powerVib);    // vibrate four times
+    digitalWrite(compNr, HIGH);    // vibrate four times
     delay(waitTime);
-    analogWrite(compNr, 0);
+    digitalWrite(compNr, LOW);
     delay(waitTime);
     }
 }
