@@ -12,29 +12,26 @@ import java.io.*;
 // can be found here: https://iddi.github.io/oocsi/)
 // ******************************************************
 
+OOCSI oocsi;
+
 int step = 0;
 //TODO mag dit weg?
 //hij huilt als ik deze weg wil halen
-String[] order = new String[4];
-order[0] = "blue";
-order[1] = "red";
-order[2] = "yellow";
-order[3] = "green";
 
 String message = "apple pear cherry";
 
 
 //poging twee tot checkmethod
-boolean fullColor = false; 
-ArrayList<String> correctColors = new ArrayList<String>(); 
-ArrayList<String> colors = new ArrayList<String>(); 
-correctColors.add("blue");
-correctColors.add("red");
-correctColors.add("yellow");
-correctColors.add("green"); 
-int counter = 0; 
+boolean fullColor = false;  
+ArrayList<String> correctColors = new ArrayList<String>() {{
+    add("blue");
+    add("red");
+    add("yellow");
+    add("green");
+}};
+ArrayList<String> colors = new ArrayList<String>(1); 
 
-OOCSI oocsi;
+int counter = 0; 
 
 void setup() {
   size(200, 200);
@@ -93,8 +90,7 @@ void NFC(OOCSIEvent event) {
   - foute combi, heartbeat sneller
   - juiste combi, plate aan 
   */
-  
-    if(!fullColor){
+  if(!fullColor){
        if(event.has("colour")){
          String color = event.getString("colour");
          if(!colors.contains(color)){
@@ -103,9 +99,9 @@ void NFC(OOCSIEvent event) {
        }
     }
   
-   if(colors.length() == 4){
+   if(colors.size() == 4){
      fullColor = true; 
-     if(colors.equals(correctColors){
+     if(colors.equals(correctColors)){
          //go to next module, plate and decrease heartbeat
          step = 1; 
          counter--;
@@ -119,6 +115,7 @@ void NFC(OOCSIEvent event) {
          checkBeat(); 
      }
    }
+    
   
 }
 
