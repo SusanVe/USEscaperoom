@@ -15,8 +15,6 @@ import java.io.*;
 OOCSI oocsi;
 
 int step = 0;
-//TODO mag dit weg?
-//hij huilt als ik deze weg wil halen
 
 String message = "apple pear cherry";
 
@@ -30,8 +28,8 @@ ArrayList<String> correctColors = new ArrayList<String>() {{
     add("green");
 }};
 ArrayList<String> colors = new ArrayList<String>(1); 
-
 int counter = 0; 
+
 
 void setup() {
   size(200, 200);
@@ -45,8 +43,7 @@ void setup() {
   // subscribe to all relevant channels
   oocsi.subscribe("Group7NFC");
   oocsi.subscribe("LE_colorbox");
-  oocsi.subscribe("LE_safe");
-  oocsi.subscribe("schoenmaat"); //heartbeat channel 
+  oocsi.subscribe("heartbeatmodule1000"); //heartbeat channel 
 
   // start by resetting
   levelReset();
@@ -55,11 +52,7 @@ void setup() {
 void heartBeat(OOCSIEvent event) {
   //op het begin hart langzaam laten kloppen, alles doorgegeven want variabelen hadden (dacht ik) geen initiële waarden 
   if(step == 0){
-    oocsi.channel("schoenmaat").data("intervalA",1).send();
-    oocsi.channel("schoenmaat").data("intervalB",0).send();
-    oocsi.channel("schoenmaat").data("intervalC",0).send();
-    oocsi.channel("schoenmaat").data("intervalD",0).send();
-    oocsi.channel("schoenmaat").data("flatline",0).send();
+    oocsi.channel("heartbeatmodule1000").data("interval", 1).send();   
   }
 }
 
@@ -110,7 +103,9 @@ void NFC(OOCSIEvent event) {
      else {
          colors.clear(); 
          fullColor = false;  
-         counter++; 
+         if (counter < 4){
+           counter++; 
+         }
          //everytime the nfc tags get scanned in the wrong order, increase heartbeat
          checkBeat(); 
      }
@@ -121,22 +116,19 @@ void NFC(OOCSIEvent event) {
 
 //TODO check even of dit werkt? Anders alle if'jes in de if else statement hierboven zetten
  public void checkBeat(){
-         if(counter == 1){
-            oocsi.channel("schoenmaat").data("intervalA",0).send();
-            oocsi.channel("schoenmaat").data("intervalB",1).send();
+         if(counter == 1){          
+            oocsi.channel("heartbeatmodule1000").data("interval",2).send();
          }
          else if(counter == 2) {
-            oocsi.channel("schoenmaat").data("intervalB",0).send();
-            oocsi.channel("schoenmaat").data("intervalC",1).send();
+            oocsi.channel("heartbeatmodule1000").data("interval",3).send();
          }
          else if(counter == 3) {
-            oocsi.channel("schoenmaat").data("intervalC",0).send();
-            oocsi.channel("schoenmaat").data("intervalD",1).send();
+            oocsi.channel("heartbeatmodule1000").data("interval",4).send();
          }
-         else if(counter == 4) {
-            oocsi.channel("schoenmaat").data("intervalD",0).send();
-            oocsi.channel("schoenmaat").data("flatline",1).send();
-            //TODO stop the level, game over levelReset() ??
+         else if(step == 2) {
+            oocsi.channel("heartbeatmodule1000").data("interval",5).send();
+            levelReset();
+            //TODO stop the level
          }
    }
 
@@ -156,29 +148,9 @@ void thePlate(OOCSIEvent event) {
   }
 }
 
-void LE_safe(OOCSIEvent event) {
-  // if right code is pressed/enter, safe should turn on
-  // plate should turn off
-  // TODO send to receiverchannel
-  if (step == 2){
-    oocsi.channel("LE_safe").data("safeLaser", 1).send();
-    oocsi.channel("thePlateAPI").data("stringCode", "").send();
-  }
-  // if safe is opened, safe module code should send string below
-  // TODO subscribe to channel that outputs completeSafe
-  if (event.has("completeSafe")) {
-    if(completeSafe > 0) {
-      step = 3;
-      //flatline after opening safe
-      oocsi.channel("schoenmaat").data("intervalA",0).send();
-      oocsi.channel("schoenmaat").data("intervalB",0).send();
-      oocsi.channel("schoenmaat").data("intervalC",0).send();
-      oocsi.channel("schoenmaat").data("intervalD",0).send();
-      oocsi.channel("schoenmaat").data("flatline",1).send();
-    }
-  }
-}
+
 
 void levelReset() {
  step = 0;
+ counter = 0; 
 }
