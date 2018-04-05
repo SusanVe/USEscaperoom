@@ -16,7 +16,7 @@ OOCSI oocsi;
 
 int step = 0;
 
-String message = "apple pear cherry";
+String message = "your goal beat risk";
 
 
 //poging twee tot checkmethod
@@ -38,15 +38,17 @@ void setup() {
   // connect to OOCSI server running on the same machine (localhost)
   // with "receiverName" to be my channel others can send data to
   // (for more information how to run an OOCSI server refer to: https://iddi.github.io/oocsi/)
-  oocsi = new OOCSI(this, "LE_level_controller_group11_1", "localhost");
+  oocsi = new OOCSI(this, "LE_level_controller_group11_1", "oocsi.id.tue.nl");
 
   // subscribe to all relevant channels
   oocsi.subscribe("Group7NFC");
-  oocsi.subscribe("LE_colorbox");
   oocsi.subscribe("heartbeatmodule1000"); //heartbeat channel 
+  oocsi.subscribe("Vaultgroup8");
+  oocsi.subscribe("theplate");
 
   // start by resetting
   levelReset();
+  thePlate();
 }
 
 void heartBeat(OOCSIEvent event) {
@@ -56,7 +58,7 @@ void heartBeat(OOCSIEvent event) {
   }
 }
 
-void NFC(OOCSIEvent event) {
+void Group7NFC(OOCSIEvent event) {
   //send 1 to the NFC module to start the scanner
   oocsi.channel("PreviousModule").data("completed", 1);
   // receive color of scanned tag, check the order
@@ -72,7 +74,7 @@ void NFC(OOCSIEvent event) {
         //TODO increase heartbeat once we receive their code
         //TODO send to right heartbeatchannel
     }
-  } */
+  } 
   
   /* 
   - boolean is false
@@ -83,6 +85,7 @@ void NFC(OOCSIEvent event) {
   - foute combi, heartbeat sneller
   - juiste combi, plate aan 
   */
+  
   if(!fullColor){
        if(event.has("colour")){
          String color = event.getString("colour");
@@ -133,18 +136,27 @@ void NFC(OOCSIEvent event) {
    }
 
 
-void thePlate(OOCSIEvent event) {
+void thePlate() {
   // if nfc tags are scannend in right order plate will start outputting
   //colorbox will turn on
   if (step == 1) {
-    oocsi.channel("thePlateHandler").data("string", message).send();
-    oocsi.channel("LE_ColorBox").data("Turn on", true).send();
+    //oocsi.channel("thePlateHandler").data("string", message).send();
     //send colorbox the right code if necessary
-  }
   // if right code is pressed/enter, colorbox will return a value
   //TODO subscribe to channel that outputs right code
-  if(event.has("right code")){
-    step = 2;
+  
+    String string = "c b z p ";
+    int result;
+    println("");
+    println("Sending to the plate: " + string);
+    delay(3000);
+    OOCSICall call = oocsi.call("thePlateHandler", 1000).data("stringCode", string);
+    
+    call.sendAndWait();
+    if (call.hasResponse()) {
+      result = call.getFirstResponse().getInt("result", 0);
+      println("Your message has been received succesfully and will be outputted " + result);
+    }
   }
 }
 
