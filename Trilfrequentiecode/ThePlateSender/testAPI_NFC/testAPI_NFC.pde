@@ -18,7 +18,7 @@ void setup() {
 
 void LE_NFC(OOCSIEvent event) {
     previousmodule = event.getBoolean("completed",false);
-    println("NFC scanner is on");
+    System.out.println("NFC scanner is on");
   }
   
 void draw() {

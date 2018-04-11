@@ -15,12 +15,13 @@ import java.io.*;
 OOCSI oocsi;
 
 int step = 0;
-
+// string that the plate will output through vibrations 
 String message = "your goal beat risk";
 
 
-//poging twee tot checkmethod
-boolean fullColor = false;  
+//needed for checking the colors outputted by nfc
+boolean fullColor = false; 
+//right order in which to scan the tags
 ArrayList<String> correctColors = new ArrayList<String>() {{
     add("blue");
     add("red");
@@ -41,56 +42,56 @@ void setup() {
   oocsi = new OOCSI(this, "LE_level_controller_group11_1", "oocsi.id.tue.nl");
 
   // subscribe to all relevant channels
+  // these are the real channels
+  /*
   oocsi.subscribe("Group7NFC");
-  oocsi.subscribe("heartbeatmodule1000"); //heartbeat channel 
+  oocsi.subscribe("heartbeatmodule1000"); 
   oocsi.subscribe("Vaultgroup8");
   oocsi.subscribe("theplate");
+  */
+// these are the testing channels
+  oocsi.subscribe("LE_NFC_1"); 
 
   // start by resetting
   levelReset();
   thePlate();
 }
 
-void heartBeat(OOCSIEvent event) {
-  //op het begin hart langzaam laten kloppen, alles doorgegeven want variabelen hadden (dacht ik) geen initiële waarden 
+void draw() {
+  background(0);
+
+  text("Level controller:", 15, 20);
+  text("Step: " + step, 15, 40);
+
+  if (step == 5) {
+    text("Click here to reset", 15, 60);
+  }
+}
+
+void mousePressed() {
+  // you can use the mouse to step through all steps for debugging
+  step = (++step) % 6;
+  if (step == 0) {
+    levelReset();
+  }
+}
+
+void heartBeat() {
   if(step == 0){
     oocsi.channel("heartbeatmodule1000").data("interval", 1).send();   
   }
 }
 
-void Group7NFC(OOCSIEvent event) {
+void LE_NFC(OOCSIEvent event) {
   //send 1 to the NFC module to start the scanner
-  oocsi.channel("PreviousModule").data("completed", 1);
-  // receive color of scanned tag, check the order
-  //TODO fix this check thing with strings, because this only works for 1 iteration.
-  /*if (event.has("colour")) {
-    String colour = event.getString("colour"); 
-    String[] scanOrder = new String[4];
-    for (int i = 0; i < scanOrder.length; i++) {
-      scanOrder[i] = colour;
-      if(order == scanOrder) {
-      step = 1;
-      } else {
-        //TODO increase heartbeat once we receive their code
-        //TODO send to right heartbeatchannel
-    }
-  } 
-  
-  /* 
-  - boolean is false
-  - array maken en daar alle colors instoppen (als deze er nog niet in zitten)
-  - als array lang genoeg is
-  - boolean true
-  - hierna checken of juiste combi
-  - foute combi, heartbeat sneller
-  - juiste combi, plate aan 
-  */
+  oocsi.channel("LE_NFC").data("completed", 1).send();
+  String color1 ="";
   
   if(!fullColor){
        if(event.has("colour")){
-         String color = event.getString("colour");
-         if(!colors.contains(color)){
-           colors.add(color); 
+         color1 = event.getString("colour");
+         if(!colors.contains(color1)){
+           colors.add(color1); 
          }
        }
     }
