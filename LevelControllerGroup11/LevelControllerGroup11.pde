@@ -50,11 +50,12 @@ void setup() {
   oocsi.subscribe("theplate");
   */
 // these are the testing channels
-  oocsi.subscribe("LE_NFC_1"); 
+  oocsi.subscribe("LE_NFC");
+  oocsi.subscribe("theplate");
 
   // start by resetting
   levelReset();
-  thePlate();
+  
 }
 
 void draw() {
@@ -78,13 +79,14 @@ void mousePressed() {
 
 void heartBeat() {
   if(step == 0){
-    oocsi.channel("heartbeatmodule1000").data("interval", 1).send();   
+    oocsi.channel("heartbeatmodule1000").data("interval", 1).send();  
+    oocsi.call("NFC").data("previousmodule", true).send();
   }
 }
 
 void LE_NFC(OOCSIEvent event) {
   //send 1 to the NFC module to start the scanner
-  oocsi.channel("LE_NFC").data("completed", 1).send();
+  
   String color1 ="";
   
   if(!fullColor){
@@ -137,7 +139,7 @@ void LE_NFC(OOCSIEvent event) {
    }
 
 
-void thePlate() {
+void theplate(OOCSIEvent event) {
   // if nfc tags are scannend in right order plate will start outputting
   //colorbox will turn on
   if (step == 1) {
