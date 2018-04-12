@@ -3,14 +3,14 @@ import nl.tue.id.oocsi.client.services.*;
 import java.util.*;
 import java.io.*;
 
-// ******************************************************
+// ******************
 // This example requires a running OOCSI server!
 //
 // How to do that? Check: Examples > Tools > LocalServer
 //
 // More information how to run an OOCSI server
 // can be found here: https://iddi.github.io/oocsi/)
-// ******************************************************
+// ******************
 
 OOCSI oocsi;
 
@@ -42,36 +42,30 @@ void setup() {
   oocsi = new OOCSI(this, "LE_level_controller_group11_1", "oocsi.id.tue.nl");
 
   // subscribe to all relevant channels
-  // these are the real channels
-  /*
   oocsi.subscribe("Group7NFC");
   oocsi.subscribe("heartbeatmodule1000"); 
   oocsi.subscribe("Vaultgroup8");
   oocsi.subscribe("theplate");
-  */
-// these are the testing channels
-  oocsi.subscribe("LE_NFC");
-  oocsi.subscribe("theplate");
 
   // start by resetting
   levelReset();
-  
+  thePlate();
 }
 
+//method that can be clicked to skip through steps
 void draw() {
   background(0);
-
   text("Level controller:", 15, 20);
   text("Step: " + step, 15, 40);
 
-  if (step == 5) {
+  if (step == 2) {
     text("Click here to reset", 15, 60);
   }
 }
 
 void mousePressed() {
   // you can use the mouse to step through all steps for debugging
-  step = (++step) % 6;
+  step = (++step) % 3;
   if (step == 0) {
     levelReset();
   }
@@ -79,16 +73,17 @@ void mousePressed() {
 
 void heartBeat() {
   if(step == 0){
-    oocsi.channel("heartbeatmodule1000").data("interval", 1).send();  
-    oocsi.call("NFC").data("previousmodule", true).send();
+    //sends 1 to heartbeat to turn on the first interval
+    oocsi.channel("heartbeatmodule1000").data("interval", 1).send();   
   }
 }
 
-void LE_NFC(OOCSIEvent event) {
+void Group7NFC(OOCSIEvent event) {
   //send 1 to the NFC module to start the scanner
+  oocsi.channel("GroupNFC").data("completed", 1).send();
   
+  //place every color received by nfc (that has not been scanned yet) in an arraylist
   String color1 ="";
-  
   if(!fullColor){
        if(event.has("colour")){
          color1 = event.getString("colour");
@@ -100,11 +95,13 @@ void LE_NFC(OOCSIEvent event) {
   
    if(colors.size() == 4){
      fullColor = true; 
+     //check if the scanned combination is correct
      if(colors.equals(correctColors)){
          //go to next module, plate and decrease heartbeat
          step = 1; 
          counter--;
          checkBeat(); 
+         colors.clear();
      }
      else {
          colors.clear(); 
@@ -120,7 +117,7 @@ void LE_NFC(OOCSIEvent event) {
   
 }
 
-//TODO check even of dit werkt? Anders alle if'jes in de if else statement hierboven zetten
+//increases heartbeat with every wrong move, flatlines after level is completed
  public void checkBeat(){
          if(counter == 1){          
             oocsi.channel("heartbeatmodule1000").data("interval",2).send();
@@ -134,21 +131,16 @@ void LE_NFC(OOCSIEvent event) {
          else if(step == 2) {
             oocsi.channel("heartbeatmodule1000").data("interval",5).send();
             levelReset();
-            //TODO stop the level
          }
    }
 
 
-void theplate(OOCSIEvent event) {
+void thePlate() {
   // if nfc tags are scannend in right order plate will start outputting
   //colorbox will turn on
   if (step == 1) {
-    //oocsi.channel("thePlateHandler").data("string", message).send();
-    //send colorbox the right code if necessary
-  // if right code is pressed/enter, colorbox will return a value
-  //TODO subscribe to channel that outputs right code
-  
-    String string = "c b z p ";
+    //string that will be outputted by the plate 
+    String string = "your goal beat risk";
     int result;
     println("");
     println("Sending to the plate: " + string);
@@ -164,7 +156,7 @@ void theplate(OOCSIEvent event) {
 }
 
 
-
+//resets the level
 void levelReset() {
  step = 0;
  counter = 0; 
